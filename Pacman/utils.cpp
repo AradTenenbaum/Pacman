@@ -37,7 +37,11 @@ void hideCursor()
 }
 
 void logScreen(Position oldPos, const char* format, ...) {
-	gotoxy(0, 25);
+	static int x = 25;
+	static int offset = 0;
+
+	gotoxy(0, x + offset);
+	offset = (offset + 1) % 5;
 	clearLine();
 
 	va_list args;
@@ -60,23 +64,10 @@ void clearLine()
 	cout << "\r" << string(80, ' ') << "\r" << flush;
 }
 
-string keyToDir(char key) {
-	string moves[5] = { "Left", "Right", "Up", "Down", "Stay"};
-	if (key == LEFT) {
-		return moves[0];
-	}
-	else if (key == RIGHT) {
-		return moves[1];
-	}
-	else if (key == UP) {
-		return moves[2];
-	}
-	else if (key == DOWN) {
-		return moves[3];
-	}
-	else if (key == STAY) {
-		return moves[4];
-	}
+void setColor(int color) {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
 
-	return "Not a valid move";
+bool isSamePos(Position p1, Position p2) {
+	return (p1.getX() == p2.getX()) && (p1.getY() == p2.getY());
 }

@@ -32,5 +32,6 @@ void Pacman::undraw() {
 }
 
 void Pacman::initPos() {
+	undraw();
 	pos.setPos(1, 1);
 }

@@ -37,8 +37,10 @@ void Game::displayInstructions() {
 void Game::init() {
 	clearScreen();
 	player.initPos();
+	ghost1.initPos();
 	points = 0;
 	lives = LIVES;
+	gameBoard = Board();
 	draw();
 }
 
@@ -49,6 +51,9 @@ void Game::run() {
 	char prevKey = 0;
 	bool isStay = true;	
 	bool isGameOver = false;
+	bool isWin = false;
+
+	int ghost1PossibleDirs[4] = {0,0,0,0};
 
 	while (!isGameOver) {
 		do {
@@ -65,15 +70,32 @@ void Game::run() {
 				}
 				player.draw();
 
-				// TODO: check for win
-
+				// check for win
+				if (gameBoard.isNoBreadCrumbs()) {
+					isWin = true;
+				}
 			}
 			else if (!isStay) {
 				logScreen(player.getPos(), "not valid move: %d", key);
-				dropLive();
 			}
-			Sleep(400);
-		} while (key != ESC && lives > 0);
+
+			// ghosts move
+			getPossibleDirs(ghost1.getPos(), ghost1PossibleDirs);
+			logScreen(ghost1.getPos(), "ghost: left->%d right->%d up->%d down->%d", ghost1PossibleDirs[0], ghost1PossibleDirs[1], ghost1PossibleDirs[2], ghost1PossibleDirs[3]);
+			ghost1.move(ghost1PossibleDirs, gameBoard.get(ghost1.getPos().getX(), ghost1.getPos().getY()));
+			ghost1.draw();
+
+			if (isSamePos(ghost1.getPos(), player.getPos())) {
+				dropLive();
+				player.initPos();
+				ghost1.initPos();
+				draw();
+				key = 0;
+				logScreen(player.getPos(), "Hit by a ghost");
+			}
+
+			Sleep(200);
+		} while (key != ESC && lives > 0 && !isWin);
 
 		if (key == ESC) {
 			pause();
@@ -82,6 +104,23 @@ void Game::run() {
 		}
 
 		if (lives == 0) {
+			clearScreen();
+			cout << "----Game Over----" << endl;
+			cout << "Press any key to return to menu" << endl;
+			char key = 0;
+			do {
+				if (_kbhit()) key = _getch();
+			} while (key == 0);
+			isGameOver = true;
+		}
+		if (isWin) {
+			clearScreen();
+			cout << "----You win----" << endl;
+			cout << "Press any key to return to menu" << endl;
+			char key = 0;
+			do {
+				if (_kbhit()) key = _getch();
+			} while (key == 0);
 			isGameOver = true;
 		}
 	}
@@ -128,7 +167,7 @@ void Game::dropLive() {
 void Game::setStats() {
 	gotoxy(0, 24);
 	clearLine();
-	cout << "Remaining Lives: " << string(lives, '$') << "   Points: " << points;
+	cout << "Remaining Lives: " << string(lives, '@') << "   Points: " << points;
 	gotoxyPos(player.getPos());
 }
 
@@ -136,5 +175,17 @@ void Game::draw() {
 	clearScreen();
 	gameBoard.print();
 	player.draw();
+	ghost1.draw();
 	setStats();
+}
+
+void Game::getPossibleDirs(Position pos, int possibleDirs[]) {
+	if (gameBoard.get(pos.getX() - 1, pos.getY()) != '#') possibleDirs[0] = 1;
+	else possibleDirs[0] = 0;
+	if (gameBoard.get(pos.getX() + 1, pos.getY()) != '#') possibleDirs[1] = 1;
+	else possibleDirs[1] = 0;
+	if (gameBoard.get(pos.getX(), pos.getY()-1) != '#') possibleDirs[2] = 1;
+	else possibleDirs[2] = 0;
+	if (gameBoard.get(pos.getX(), pos.getY() + 1) != '#') possibleDirs[3] = 1;
+	else possibleDirs[3] = 0;
 }
