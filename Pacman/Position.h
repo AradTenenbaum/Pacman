@@ -12,4 +12,5 @@ public:
 	int getY() { return y; };
 	void setPos(int _x, int _y);
 	Position posAfterMove(int dir);
+	bool isTunnel(int dir);
 };

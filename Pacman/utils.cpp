@@ -36,7 +36,7 @@ void hideCursor()
 	SetConsoleCursorInfo(myconsole, &CURSOR);
 }
 
-void logScreen(Position oldPos, const char* format, ...) {
+void logScreen(const char* format, ...) {
 	static int x = 25;
 	static int offset = 0;
 
@@ -56,7 +56,6 @@ void logScreen(Position oldPos, const char* format, ...) {
 
 	cout << str;
 
-	gotoxyPos(oldPos);
 }
 
 void clearLine()
@@ -64,10 +63,14 @@ void clearLine()
 	cout << "\r" << string(80, ' ') << "\r" << flush;
 }
 
-void setColor(int color) {
+void setElementColor(int color) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
 bool isSamePos(Position p1, Position p2) {
 	return (p1.getX() == p2.getX()) && (p1.getY() == p2.getY());
+}
+
+bool isOnBounds(int x, int y) {
+	return (x < (WIDTH - 1) && (x >= 0) && (y < HEIGHT) && (y >= 0));
 }

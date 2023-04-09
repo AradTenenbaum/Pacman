@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 int main()
 {
 	Game game = Game();
@@ -19,6 +18,9 @@ int main()
 		if (choice == 1) {
 			game.init();
 			game.run();
+		}
+		else if (choice == 7) {
+			game.displaySettings();
 		}
 		else if (choice == 8) {
 			game.displayInstructions();

@@ -7,7 +7,9 @@ using namespace std;
 void Ghost::move(int possibleDirs[], char prevChar) {
 
 	gotoxyPos(pos);
+	//setElementColor(BRIGHT_GREEN);
 	cout << prevChar;
+	//setElementColor(DEFAULT);
 
 	int dir, dirIndex = 0, numOfDirs = 0;
 	for (int i = 0; i < 4; i++) {
@@ -38,7 +40,9 @@ void Ghost::move(int possibleDirs[], char prevChar) {
 
 void Ghost::draw() {
 	gotoxyPos(pos);
+	setElementColor(color);
 	cout << sign;
+	setElementColor(DEFAULT);
 }
 
 void Ghost::undraw() {
