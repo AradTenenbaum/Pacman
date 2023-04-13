@@ -39,7 +39,7 @@ void Board::print() {
 	}
 }
 
-void Board::setPos(Position pos, char c) {
+void Board::setPos(const Position& pos, char c) {
 	if (board[pos.getY()][pos.getX()] == '*') breadCurmbs--;
 	board[pos.getY()][pos.getX()] = c;
 }

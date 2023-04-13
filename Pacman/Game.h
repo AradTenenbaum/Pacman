@@ -16,6 +16,7 @@ class Game {
 	Ghost ghost2;
 	int points=0, lives=LIVES;
 	bool isColors = true;
+	int speed = 200;
 public:
 	void displayMenu();
 	void displayInstructions();

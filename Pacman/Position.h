@@ -8,8 +8,8 @@ public:
 	Position() : x(1), y(1) {};
 	void addX(int xAdd) { x += xAdd; };
 	void addY(int yAdd) { y += yAdd; };
-	int getX() { return x; };
-	int getY() { return y; };
+	int getX() const { return x; };
+	int getY() const { return y; };
 	void setPos(int _x, int _y);
 	Position posAfterMove(int dir);
 	bool isTunnel(int dir);

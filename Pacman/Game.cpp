@@ -96,17 +96,28 @@ void Game::run() {
 	int ghost1PossibleDirs[4] = { 0,0,0,0 };
 	int ghost2PossibleDirs[4] = { 0,0,0,0 };
 
+	Position ghost1PrevPos, ghost2PrevPos, playerPrevPos;
+
 	while (!isGameOver) {
 		do {
+			// count game iterations
 			iteration++;
 
+			// set prev positions
+			ghost1PrevPos = ghost1.getPos();
+			ghost2PrevPos = ghost2.getPos();
+			playerPrevPos = player.getPos();
+
+			// check for key change
 			if (_kbhit()) {
 				prevKey = key;
 				key = _getch();
 				isStay = ((key == STAY) || (key == STAY_L));
 			}
+			// check if move is valid and move if it is
 			if (isValidMove(key) && !isStay) {
 				player.move(key);
+				// check if breadcrumb exist for increasing points
 				if (onBreadCurmb()) {
 					addPoints(10);
 					gameBoard.setPos(player.getPos(), ' ');
@@ -127,8 +138,6 @@ void Game::run() {
 				getPossibleDirs(ghost1.getPos(), ghost1PossibleDirs);
 				getPossibleDirs(ghost2.getPos(), ghost2PossibleDirs);
 
-				//logScreen("ghost1: left->%d right->%d up->%d down->%d", ghost1PossibleDirs[0], ghost1PossibleDirs[1], ghost1PossibleDirs[2], ghost1PossibleDirs[3]);
-				//logScreen("ghost2: left->%d right->%d up->%d down->%d", ghost2PossibleDirs[0], ghost2PossibleDirs[1], ghost2PossibleDirs[2], ghost2PossibleDirs[3]);
 
 				ghost1.move(ghost1PossibleDirs, gameBoard.get(ghost1.getPos().getX(), ghost1.getPos().getY()));
 				ghost1.draw();
@@ -136,14 +145,22 @@ void Game::run() {
 				ghost2.draw();
 			}
 
-			logScreen("State: pacman-(%d,%d), ghost1-(%d,%d), ghost2-(%d,%d)", 
+			/*
+			logScreen("State: pacman(%d,%d), ghost1(%d,%d), ghost2(%d,%d)", 
 				player.getPos().getX(), player.getPos().getY(), 
 				ghost1.getPos().getX(), ghost1.getPos().getY(), 
 				ghost2.getPos().getX(), ghost2.getPos().getY());
+			*/
 
-			// TODO: check swap places
+			// check if player on the same position of one of the ghosts
+			// check if player or one of the ghosts swap places
+			// drop one live if true
 			if (isSamePos(ghost1.getPos(), player.getPos()) || 
-				isSamePos(ghost2.getPos(), player.getPos())) {
+				isSamePos(ghost2.getPos(), player.getPos()) ||
+				(isSamePos(ghost1PrevPos, player.getPos()) &&
+				(isSamePos(playerPrevPos, ghost1.getPos()))) ||
+				(isSamePos(ghost2PrevPos, player.getPos()) &&
+				(isSamePos(playerPrevPos, ghost2.getPos())))) {
 				dropLive();
 				player.initPos();
 				ghost1.initPos();
@@ -153,7 +170,7 @@ void Game::run() {
 				logScreen("Hit by a ghost");
 			}
 
-			Sleep(200);
+			Sleep(speed);
 		} while (key != ESC && lives > 0 && !isWin);
 
 		if (key == ESC) {

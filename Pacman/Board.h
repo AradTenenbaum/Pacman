@@ -18,6 +18,6 @@ public:
         return board[y][x];
     }
     bool isNoBreadCrumbs();
-    void setPos(Position pos, char c);
+    void setPos(const Position& pos, char c);
     void setColor(int _color) { color = _color; };
 };
