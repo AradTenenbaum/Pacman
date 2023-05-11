@@ -145,13 +145,6 @@ void Game::run() {
 				ghost2.draw();
 			}
 
-			/*
-			logScreen("State: pacman(%d,%d), ghost1(%d,%d), ghost2(%d,%d)", 
-				player.getPos().getX(), player.getPos().getY(), 
-				ghost1.getPos().getX(), ghost1.getPos().getY(), 
-				ghost2.getPos().getX(), ghost2.getPos().getY());
-			*/
-
 			// check if player on the same position of one of the ghosts
 			// check if player or one of the ghosts swap places
 			// drop one live if true
