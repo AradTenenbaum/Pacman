@@ -1,17 +1,11 @@
 #pragma once
 #include "Position.h"
 #include "utils.h"
+#include "GameObject.h"
 
-class Ghost {
-	Position pos;
-	const char sign = '$';
-	char color = DEFAULT;
+class Ghost : public GameObject {
 public:
-	void move(int possibleDirs[], char prevChar);
-	void draw();
+	Ghost() : GameObject('$', DEFAULT) {};
+	void move(int dir);
 	void initPos();
-	Position getPos() { return pos; };
-	void setColor(int _color) { color = _color; };
-private:
-	void undraw();
 };

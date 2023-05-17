@@ -47,3 +47,8 @@ void Board::setPos(const Position& pos, char c) {
 bool Board::isNoBreadCrumbs() {
 	return (breadCurmbs == 0);
 }
+
+void Board::drawPos(const Position& pos) {
+	gotoxyPos(pos);
+	cout << board[pos.getY()][pos.getX()];
+}

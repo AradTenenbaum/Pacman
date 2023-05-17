@@ -1,10 +1,11 @@
-#include "Ghost.h"
+#include "Fruit.h"
 #include <iostream>
 #include <cstdlib>
 #include "utils.h"
+
 using namespace std;
 
-void Ghost::move(int dir) {
+void Fruit::move(int dir) {
 	prevPos = pos;
 
 	if (dir == 0) {
@@ -22,8 +23,6 @@ void Ghost::move(int dir) {
 
 }
 
-
-
-void Ghost::initPos() {
-	pos.setPos(66, 21);
+void Fruit::initPos() {
+	pos.setPos(5, 22);
 }

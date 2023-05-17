@@ -5,7 +5,7 @@
 using namespace std;
 
 void Pacman::move(int dir) {
-	undraw();
+	prevPos = pos;
 	
 	if ((dir == LEFT) || (dir == LEFT_L)) {
 		if (pos.isTunnel(dir)) pos.setPos(WIDTH-2, pos.getY());
@@ -25,19 +25,6 @@ void Pacman::move(int dir) {
 	}
 }
 
-void Pacman::draw() {
-	gotoxyPos(pos);
-	setElementColor(color);
-	cout << sign;
-	setElementColor(DEFAULT);
-}
-
-void Pacman::undraw() {
-	gotoxyPos(pos);
-	cout << ' ';
-}
-
 void Pacman::initPos() {
-	undraw();
 	pos.setPos(1, 1);
 }

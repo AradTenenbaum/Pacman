@@ -17,7 +17,11 @@ public:
     char get(int x, int y) const {
         return board[y][x];
     }
+    char getPos(Position& pos) const {
+        return board[pos.getY()][pos.getX()];
+    }
     bool isNoBreadCrumbs();
     void setPos(const Position& pos, char c);
     void setColor(int _color) { color = _color; };
+    void drawPos(const Position& pos);
 };

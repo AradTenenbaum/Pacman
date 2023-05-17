@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include "utils.h"
 #include <conio.h>
 #include <windows.h>
@@ -73,4 +74,28 @@ bool isSamePos(Position p1, Position p2) {
 
 bool isOnBounds(int x, int y) {
 	return (x < (WIDTH - 1) && (x >= 0) && (y < HEIGHT) && (y >= 0));
+}
+
+int getRandomMove(int possibleDirs[]) {
+	int dir, dirIndex = 0, numOfDirs = 0;
+	for (int i = 0; i < 4; i++) {
+		if (possibleDirs[i] == 1) numOfDirs++;
+	}
+	dir = rand() % numOfDirs;
+	int i = 0;
+	int newIndex = (dir % numOfDirs);
+	while (newIndex >= 0) {
+		if (possibleDirs[dirIndex] == 1) newIndex--;
+		dirIndex++;
+	}
+	dirIndex--;
+
+	return dirIndex;
+}
+
+int getRandomNumber(int min, int max) {
+	random_device rd;                           
+	mt19937 eng(rd());                          
+	uniform_int_distribution<int> distribution(min, max);  
+	return distribution(eng);
 }

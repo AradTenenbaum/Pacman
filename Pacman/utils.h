@@ -22,3 +22,5 @@ void logScreen(const char* format, ...);
 bool isSamePos(Position p1, Position p2);
 bool isOnBounds(int x, int y);
 void setElementColor(int color);
+int getRandomMove(int possibleDirs[]);
+int getRandomNumber(int min, int max);

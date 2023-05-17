@@ -2,7 +2,9 @@
 #include "Board.h"
 #include <conio.h>
 #include <windows.h>
+#include <typeinfo>
 #include "utils.h"
+#include <typeinfo>
 
 void Game::displayMenu() {
 	clearScreen();
@@ -61,23 +63,38 @@ void Game::displaySettings() {
 }
 
 void Game::init() {
+
+	gameObjects.clear();
+	gameObjects.push_back(new Pacman());
+	setPlayer(static_cast<Pacman*>(gameObjects.front()));
+	for (int i = 0; i < maxGhostsAmount; i++) {
+		gameObjects.push_back(new Ghost());
+	}
+ 
+
 	clearScreen();
+
 	gameBoard = Board();
+
 	if (isColors) {
-		player.setColor(YELLOW);
-		ghost1.setColor(RED);
-		ghost2.setColor(BLUE);
+		for (const auto& gameObject : gameObjects) {
+			if(typeid(*gameObject) == typeid(Pacman)) {
+				(gameObject)->setColor(YELLOW);
+			}
+			else if (typeid(*gameObject) == typeid(Ghost)) {
+				(gameObject)->setColor(RED);
+			}
+		}
 		gameBoard.setColor(BRIGHT_GREEN);
 	} 
 	else {
-		player.setColor(DEFAULT);
-		ghost1.setColor(DEFAULT);
-		ghost2.setColor(DEFAULT);
+		for (const auto& gameObject : gameObjects) {
+			(gameObject)->setColor(DEFAULT);
+		}
 		gameBoard.setColor(DEFAULT);
 	}
-	player.initPos();
-	ghost1.initPos();
-	ghost2.initPos();
+
+	initPositions();
 	points = 0;
 	lives = LIVES;
 	draw();
@@ -92,21 +109,20 @@ void Game::run() {
 	bool isGameOver = false;
 	bool isWin = false;
 	int iteration = 0;
+	Fruit* toEatFruit = nullptr;
+	int fruitAmount = 0;
 
-	int ghost1PossibleDirs[4] = { 0,0,0,0 };
-	int ghost2PossibleDirs[4] = { 0,0,0,0 };
-
-	Position ghost1PrevPos, ghost2PrevPos, playerPrevPos;
+	int possibleDirs[4] = { 0,0,0,0 };
 
 	while (!isGameOver) {
 		do {
 			// count game iterations
 			iteration++;
 
-			// set prev positions
-			ghost1PrevPos = ghost1.getPos();
-			ghost2PrevPos = ghost2.getPos();
-			playerPrevPos = player.getPos();
+			if (((iteration % 10) == getRandomNumber(1, 10)) && (fruitAmount <= maxFruitAmount)) {
+				fruitSpawn();
+				fruitAmount++;
+			}
 
 			// check for key change
 			if (_kbhit()) {
@@ -114,53 +130,65 @@ void Game::run() {
 				key = _getch();
 				isStay = ((key == STAY) || (key == STAY_L));
 			}
-			// check if move is valid and move if it is
-			if (isValidMove(key) && !isStay) {
-				player.move(key);
-				// check if breadcrumb exist for increasing points
-				if (onBreadCurmb()) {
-					addPoints(10);
-					gameBoard.setPos(player.getPos(), ' ');
+
+			for (const auto& gameObject : gameObjects) {
+				if (typeid(*gameObject) == typeid(Pacman)) {
+					if(isValidMove(key) && !isStay) {
+						gameBoard.drawPos(gameObject->getPos());
+						gameObject->move(key);
+						// check if breadcrumb exist for increasing points
+						if (onBreadCurmb()) {
+							addPoints(10);
+							gameBoard.setPos(gameObject->getPos(), ' ');
+						}
+						gameObject->draw();
+
+						// check for win
+						if (gameBoard.isNoBreadCrumbs()) {
+							isWin = true;
+						}
+					}
+					else if (!isStay) {
+						logScreen("not a valid move: %d", key);
+					}
 				}
-				player.draw();
+				else if (typeid(*gameObject) == typeid(Ghost)) {
+					if (iteration % 2 == 0) {
+						// ghosts move
+						getPossibleDirs(gameObject->getPos(), possibleDirs);
+						gameBoard.drawPos(gameObject->getPos());
+						gameObject->move(getRandomMove(possibleDirs));
+						gameObject->draw();
+					}
 
-				// check for win
-				if (gameBoard.isNoBreadCrumbs()) {
-					isWin = true;
+					// check if player on the same position of one of the ghosts
+					// check if player or one of the ghosts swap places
+					// drop one live if true
+					if (player->isCollide(gameObject->getPos(), gameObject->getPrevPos())) {
+						dropLive();
+						initPositions();
+						key = 0;
+						logScreen("Hit by a ghost");
+					}
+				}
+				else if (typeid(*gameObject) == typeid(Fruit)) {
+					if (iteration % 4 == 0) {
+						getPossibleDirs(gameObject->getPos(), possibleDirs);
+						gameBoard.drawPos(gameObject->getPos());
+						gameObject->move(getRandomMove(possibleDirs));
+						gameObject->draw();
+					}
+
+					if (player->isCollide(gameObject->getPos(), gameObject->getPrevPos())) {
+						toEatFruit = static_cast<Fruit*>(gameObject);
+					}
 				}
 			}
-			else if (!isStay) {
-				logScreen("not valid move: %d", key);
-			}
 
-			if (iteration % 2 == 0) {
-				// ghosts move
-				getPossibleDirs(ghost1.getPos(), ghost1PossibleDirs);
-				getPossibleDirs(ghost2.getPos(), ghost2PossibleDirs);
-
-
-				ghost1.move(ghost1PossibleDirs, gameBoard.get(ghost1.getPos().getX(), ghost1.getPos().getY()));
-				ghost1.draw();
-				ghost2.move(ghost2PossibleDirs, gameBoard.get(ghost2.getPos().getX(), ghost2.getPos().getY()));
-				ghost2.draw();
-			}
-
-			// check if player on the same position of one of the ghosts
-			// check if player or one of the ghosts swap places
-			// drop one live if true
-			if (isSamePos(ghost1.getPos(), player.getPos()) || 
-				isSamePos(ghost2.getPos(), player.getPos()) ||
-				(isSamePos(ghost1PrevPos, player.getPos()) &&
-				(isSamePos(playerPrevPos, ghost1.getPos()))) ||
-				(isSamePos(ghost2PrevPos, player.getPos()) &&
-				(isSamePos(playerPrevPos, ghost2.getPos())))) {
-				dropLive();
-				player.initPos();
-				ghost1.initPos();
-				ghost2.initPos();
-				draw();
-				key = 0;
-				logScreen("Hit by a ghost");
+			if (toEatFruit) {
+				eatFruit(static_cast<Fruit*>(toEatFruit));
+				fruitAmount--;
+				toEatFruit = nullptr;
 			}
 
 			Sleep(speed);
@@ -195,6 +223,11 @@ void Game::run() {
 	}
 }
 
+void Game::initPositions() {
+	for (const auto& gameObject : gameObjects) gameObject->initPos();
+	draw();
+}
+
 void Game::pause() {
 	char key = 0;
 	clearScreen();
@@ -207,8 +240,8 @@ void Game::pause() {
 }
 
 bool Game::isValidMove(int dir) {
-	Position&& newPos = player.getPos().posAfterMove(dir);
-	char gamePosObj = gameBoard.get(newPos.getX(), newPos.getY());
+	Position&& newPos = player->getPos().posAfterMove(dir);
+	char gamePosObj = gameBoard.getPos(newPos);
 	if (gamePosObj == '#') {
 		return false;
 	}
@@ -216,8 +249,8 @@ bool Game::isValidMove(int dir) {
 }
 
 bool Game::onBreadCurmb() {
-	Position&& pos = player.getPos();
-	char gamePosObj = gameBoard.get(pos.getX(), pos.getY());
+	Position&& pos = player->getPos();
+	char gamePosObj = gameBoard.getPos(pos);
 	if (gamePosObj == '*') {
 		return true;
 	}
@@ -237,19 +270,35 @@ void Game::setStats() {
 	gotoxy(0, 24);
 	clearLine();
 	cout << "Remaining Lives: " << string(lives, '@') << "   Points: " << points;
-	gotoxyPos(player.getPos());
+	gotoxyPos(player->getPos());
 }
 
 void Game::draw() {
 	clearScreen();
 	gameBoard.print();
-	player.draw();
-	ghost1.draw();
-	ghost2.draw();
+	for (const auto& gameObject : gameObjects) {
+		gameObject->draw();
+	}
 	setStats();
 }
 
-void Game::getPossibleDirs(Position pos, int possibleDirs[]) {
+void Game::fruitSpawn() {
+	gameObjects.push_front(new Fruit());
+	gameObjects.front()->initPos();
+	if (isColors) gameObjects.front()->setColor(BLUE);
+	gameObjects.front()->draw();
+}
+
+void Game::eatFruit(Fruit* fruit) {
+	logScreen("Eat a fruit, gained %d points", fruit->getVal());
+	points += fruit->getVal();
+	setStats();
+	gameObjects.remove_if([fruit](GameObject* obj) {
+		return obj == fruit;
+	});
+}
+
+void Game::getPossibleDirs(const Position& pos, int possibleDirs[]) {
 	if (gameBoard.get(pos.getX() - 1, pos.getY()) != '#' && isOnBounds(pos.getX() - 1, pos.getY())) possibleDirs[0] = 1;
 	else possibleDirs[0] = 0;
 	if (gameBoard.get(pos.getX() + 1, pos.getY()) != '#' && isOnBounds(pos.getX() + 1, pos.getY())) possibleDirs[1] = 1;
