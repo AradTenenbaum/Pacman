@@ -21,6 +21,7 @@ class Game {
 	int points=0, lives=LIVES;
 	bool isColors = true;
 	int speed = 200;
+	int fruitAmount = 0;
 	int maxFruitAmount = 5;
 	int maxGhostsAmount = 2;
 public:
@@ -43,5 +44,6 @@ private:
 	void getPossibleDirs(const Position& pos, int possibleDirs[]);
 	void fruitSpawn();
 	void eatFruit(Fruit* fruit);
+	void fruitDisappear(Fruit* fruit);
 };
 

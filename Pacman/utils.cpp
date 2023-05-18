@@ -99,3 +99,9 @@ int getRandomNumber(int min, int max) {
 	uniform_int_distribution<int> distribution(min, max);  
 	return distribution(eng);
 }
+
+int getRandomColor() {
+	int colors[] = {RED, BLUE, GRAY, WHITE, PURPLE};
+	int colorIndex = getRandomNumber(0, 4);
+	return colors[colorIndex];
+}

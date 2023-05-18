@@ -11,7 +11,7 @@ protected:
 public:
 	GameObject(char _sign, char _color) : sign(_sign), color(_color) {};
 	virtual ~GameObject() = default;
-	virtual void move(int dir) = 0;
+	virtual void move(int dir);
 	virtual void initPos() = 0;
 	void setColor(int _color) { color = _color; };
 	Position getPrevPos() { return prevPos; };

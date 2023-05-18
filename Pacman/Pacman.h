@@ -6,6 +6,6 @@
 class Pacman : public GameObject {
 public:
 	Pacman() : GameObject('@', DEFAULT) {};
-	void move(int dir);
+	void move(int dir) override;
 	void initPos();
 };

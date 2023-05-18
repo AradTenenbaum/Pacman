@@ -82,7 +82,7 @@ void Game::init() {
 				(gameObject)->setColor(YELLOW);
 			}
 			else if (typeid(*gameObject) == typeid(Ghost)) {
-				(gameObject)->setColor(RED);
+				(gameObject)->setColor(getRandomColor());
 			}
 		}
 		gameBoard.setColor(BRIGHT_GREEN);
@@ -110,7 +110,7 @@ void Game::run() {
 	bool isWin = false;
 	int iteration = 0;
 	Fruit* toEatFruit = nullptr;
-	int fruitAmount = 0;
+	list<Fruit*> deadFruits;
 
 	int possibleDirs[4] = { 0,0,0,0 };
 
@@ -170,17 +170,22 @@ void Game::run() {
 						key = 0;
 						logScreen("Hit by a ghost");
 					}
+					
 				}
 				else if (typeid(*gameObject) == typeid(Fruit)) {
 					if (iteration % 4 == 0) {
 						getPossibleDirs(gameObject->getPos(), possibleDirs);
 						gameBoard.drawPos(gameObject->getPos());
 						gameObject->move(getRandomMove(possibleDirs));
+						static_cast<Fruit*>(gameObject)->turn();
 						gameObject->draw();
 					}
 
 					if (player->isCollide(gameObject->getPos(), gameObject->getPrevPos())) {
 						toEatFruit = static_cast<Fruit*>(gameObject);
+					}
+					else if(static_cast<Fruit*>(gameObject)->isDead()) {
+						deadFruits.push_back(static_cast<Fruit*>(gameObject));
 					}
 				}
 			}
@@ -190,6 +195,11 @@ void Game::run() {
 				fruitAmount--;
 				toEatFruit = nullptr;
 			}
+
+			for (Fruit* f : deadFruits) {
+				fruitDisappear(f);
+			}
+			deadFruits.clear();
 
 			Sleep(speed);
 		} while (key != ESC && lives > 0 && !isWin);
@@ -285,17 +295,24 @@ void Game::draw() {
 void Game::fruitSpawn() {
 	gameObjects.push_front(new Fruit());
 	gameObjects.front()->initPos();
-	if (isColors) gameObjects.front()->setColor(BLUE);
+	if (isColors) gameObjects.front()->setColor(getRandomColor());
 	gameObjects.front()->draw();
+}
+
+void Game::fruitDisappear(Fruit* fruit) {
+	fruitAmount--;
+	gameBoard.drawPos(fruit->getPos());
+	gameObjects.remove_if([fruit](GameObject* obj) {
+		return obj == fruit;
+	});
 }
 
 void Game::eatFruit(Fruit* fruit) {
 	logScreen("Eat a fruit, gained %d points", fruit->getVal());
 	points += fruit->getVal();
 	setStats();
-	gameObjects.remove_if([fruit](GameObject* obj) {
-		return obj == fruit;
-	});
+	fruitDisappear(fruit);
+	player->draw();
 }
 
 void Game::getPossibleDirs(const Position& pos, int possibleDirs[]) {

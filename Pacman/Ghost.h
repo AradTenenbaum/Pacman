@@ -6,6 +6,5 @@
 class Ghost : public GameObject {
 public:
 	Ghost() : GameObject('$', DEFAULT) {};
-	void move(int dir);
 	void initPos();
 };
