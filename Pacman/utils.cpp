@@ -3,7 +3,9 @@
 #include "utils.h"
 #include <conio.h>
 #include <windows.h>
+#include <memory>
 #include <string>
+#include <stdexcept>
 #include <cstdarg>
 
 using namespace std;
@@ -69,7 +71,7 @@ void setElementColor(int color) {
 }
 
 bool isSamePos(Position p1, Position p2) {
-	return (p1.getX() == p2.getX()) && (p1.getY() == p2.getY());
+	return (p1 == p2);
 }
 
 bool isOnBounds(int x, int y) {
@@ -104,4 +106,25 @@ int getRandomColor() {
 	int colors[] = {RED, BLUE, GRAY, WHITE, PURPLE};
 	int colorIndex = getRandomNumber(0, 4);
 	return colors[colorIndex];
+}
+
+string formatStr(const char* format, ...) {
+	static int x = 25;
+	static int offset = 0;
+
+	gotoxy(0, x + offset);
+	offset = (offset + 1) % 5;
+	clearLine();
+
+	va_list args;
+	va_start(args, format);
+	int len = vsnprintf(nullptr, 0, format, args);
+	va_end(args);
+
+	string str(len, ' ');
+	va_start(args, format);
+	vsnprintf(&str[0], len + 1, format, args);
+	va_end(args);
+
+	return str;
 }

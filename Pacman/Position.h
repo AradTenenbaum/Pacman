@@ -12,5 +12,6 @@ public:
 	int getY() const { return y; };
 	void setPos(int _x, int _y);
 	Position posAfterMove(int dir);
+	bool operator==(const Position& p) const { return (p.getX() == x && p.getY() == y); };
 	bool isTunnel(int dir);
 };

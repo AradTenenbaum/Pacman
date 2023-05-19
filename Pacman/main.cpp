@@ -19,6 +19,9 @@ int main()
 			game.init();
 			game.run();
 		}
+		else if (choice == 6) {
+			game.displayLevels();
+		}
 		else if (choice == 7) {
 			game.displaySettings();
 		}

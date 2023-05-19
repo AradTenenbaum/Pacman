@@ -5,12 +5,18 @@
 #include <typeinfo>
 #include "utils.h"
 #include <typeinfo>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
 
 void Game::displayMenu() {
 	clearScreen();
 	gotoxy(0, 0);
 	cout << "----Welcome To The Pacman Game----" << endl;
 	cout << "(1) Start a new game" << endl;
+	cout << "(6) Change Level from a file" << endl;	
 	cout << "(7) Settings" << endl;
 	cout << "(8) Present instructions and keys" << endl;
 	cout << "(9) EXIT" << endl;
@@ -34,6 +40,67 @@ void Game::displayInstructions() {
 	char key = 0;
 	do {
 		if (_kbhit()) key = _getch();
+	} while (key != ENTER);
+}
+
+void Game::displayLevels() {
+	char key = 0;
+	int newLevel = 0;
+	clearScreen();
+	gotoxy(0, 0);
+	cout << "------Levels--------" << endl;
+	cout << "level: " << level << endl;
+	cout << "(D) level-up" << endl;
+	cout << "(A) level-down" << endl;
+	cout << "(S) enter a file name" << endl;
+	cout << "--------------------" << endl;
+	cout << "Press ENTER to continue" << endl;
+	do {
+		if (_kbhit()) key = _getch();
+		if (key == 'D' || key == 'd') {
+			levelUp();
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Levels--------" << endl;
+			cout << "level: " << level << endl;
+			cout << "(D) level-up" << endl;
+			cout << "(A) level-down" << endl;
+			cout << "(S) enter a file name" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
+		if (key == 'A' || key == 'a') {
+			levelDown();
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Levels--------" << endl;
+			cout << "level: " << level << endl;
+			cout << "(D) level-up" << endl;
+			cout << "(A) level-down" << endl;
+			cout << "(S) enter a file name" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
+		if (key == 'S' || key == 's') {
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Levels--------" << endl;
+			cout << "Level: ";
+			cin >> newLevel;
+			setLevel(newLevel);
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Levels--------" << endl;
+			cout << "level: " << level << endl;
+			cout << "(D) level-up" << endl;
+			cout << "(A) level-down" << endl;
+			cout << "(S) enter a file name" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
 	} while (key != ENTER);
 }
 
@@ -63,18 +130,45 @@ void Game::displaySettings() {
 }
 
 void Game::init() {
+	isErrorInInit = false;
+	fstream newfile;
+	newfile.open(formatStr("pacman_%02d.screen.txt", level), ios_base::in);
+
+	char board[HEIGHT][WIDTH];
 
 	gameObjects.clear();
-	gameObjects.push_back(new Pacman());
-	setPlayer(static_cast<Pacman*>(gameObjects.front()));
-	for (int i = 0; i < maxGhostsAmount; i++) {
-		gameObjects.push_back(new Ghost());
+
+	if (newfile.is_open()) {
+		string tp;
+		int i = 0;
+		while (getline(newfile, tp)) {
+			for (int j = 0; j <= tp.size(); j++) {
+				Position pos = Position(j, i);
+				if (tp[j] == '%') board[i][j] = ' ';
+				else if (tp[j] == '@') {
+					Pacman* player = new Pacman(pos);
+					gameObjects.push_back(player);
+					setPlayer(player);
+					board[i][j] = ' ';
+				}
+				else if (tp[j] == '$') {
+					gameObjects.push_back(new Ghost(pos));
+					board[i][j] = ' ';
+				}
+				else board[i][j] = tp[j];
+			}
+			i++;
+		}
+		newfile.close();
+	}
+	else {
+		isErrorInInit = true;
+		return;
 	}
  
-
 	clearScreen();
 
-	gameBoard = Board();
+	gameBoard.setBoard(board);
 
 	if (isColors) {
 		for (const auto& gameObject : gameObjects) {
@@ -101,6 +195,19 @@ void Game::init() {
 }
 
 void Game::run() {
+	if (isErrorInInit) {
+		clearScreen();
+		gotoxy(0, 0);
+		cout << "Error in init game -> file not exists" << endl;
+		cout << "-------------------------------------" << endl;
+		cout << "Press ENTER to back to the menu" << endl;
+		char key = 0;
+		do {
+			if (_kbhit()) key = _getch();
+		} while (key != ENTER);
+		return;
+	}
+
 	hideCursor();
 	int move = 0;
 	char key = 0;
@@ -111,6 +218,7 @@ void Game::run() {
 	int iteration = 0;
 	Fruit* toEatFruit = nullptr;
 	list<Fruit*> deadFruits;
+	Position spot;
 
 	int possibleDirs[4] = { 0,0,0,0 };
 
@@ -120,7 +228,10 @@ void Game::run() {
 			iteration++;
 
 			if (((iteration % 10) == getRandomNumber(1, 10)) && (fruitAmount <= maxFruitAmount)) {
-				fruitSpawn();
+				spot = Position(getRandomNumber(0, WIDTH - 2), getRandomNumber(0, HEIGHT - 1));
+				if (isFreeSpot(spot)) {
+					fruitSpawn(spot);
+				}
 				fruitAmount++;
 			}
 
@@ -157,7 +268,8 @@ void Game::run() {
 						// ghosts move
 						getPossibleDirs(gameObject->getPos(), possibleDirs);
 						gameBoard.drawPos(gameObject->getPos());
-						gameObject->move(getRandomMove(possibleDirs));
+						//gameObject->move(getRandomMove(possibleDirs));
+						static_cast<Ghost*>(gameObject)->smartMove(player->getPos(), possibleDirs);
 						gameObject->draw();
 					}
 
@@ -292,8 +404,8 @@ void Game::draw() {
 	setStats();
 }
 
-void Game::fruitSpawn() {
-	gameObjects.push_front(new Fruit());
+void Game::fruitSpawn(Position& spot) {
+	gameObjects.push_front(new Fruit(spot));
 	gameObjects.front()->initPos();
 	if (isColors) gameObjects.front()->setColor(getRandomColor());
 	gameObjects.front()->draw();
@@ -324,4 +436,12 @@ void Game::getPossibleDirs(const Position& pos, int possibleDirs[]) {
 	else possibleDirs[2] = 0;
 	if (gameBoard.get(pos.getX(), pos.getY() + 1) != '#' && isOnBounds(pos.getX(), pos.getY() + 1)) possibleDirs[3] = 1;
 	else possibleDirs[3] = 0;
+}
+
+bool Game::isFreeSpot(Position& spot) {
+	if (gameBoard.getPos(spot) == '#') return false;
+	for (const auto& gameObject : gameObjects) {
+		if (gameObject->getPos() == spot) return false;
+	}
+	return true;
 }

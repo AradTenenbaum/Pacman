@@ -24,7 +24,3 @@ void Pacman::move(int dir) {
 		else pos.addY(1);
 	}
 }
-
-void Pacman::initPos() {
-	pos.setPos(1, 1);
-}

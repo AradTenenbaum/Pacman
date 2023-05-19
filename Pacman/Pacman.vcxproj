@@ -147,6 +147,11 @@
     <ClInclude Include="Position.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="pacman_01.screen.txt" />
+    <Text Include="pacman_02.screen.txt" />
+    <Text Include="pacman_03.screen.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

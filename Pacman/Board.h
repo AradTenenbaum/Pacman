@@ -4,8 +4,6 @@
 #include "Position.h"
 #include "utils.h"
 
-using namespace std;
-
 class Board {
     enum { WIDTH = 81, HEIGHT = 24 };
     char board[HEIGHT][WIDTH];
@@ -13,6 +11,7 @@ class Board {
     char color = DEFAULT;
 public:
     Board();
+    void setBoard(char _board[HEIGHT][WIDTH]);
     void print();
     char get(int x, int y) const {
         return board[y][x];

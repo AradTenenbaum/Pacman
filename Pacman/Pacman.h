@@ -5,7 +5,6 @@
 
 class Pacman : public GameObject {
 public:
-	Pacman() : GameObject('@', DEFAULT) {};
+	Pacman(Position& startPos) : GameObject('@', DEFAULT, startPos) {};
 	void move(int dir) override;
-	void initPos();
 };

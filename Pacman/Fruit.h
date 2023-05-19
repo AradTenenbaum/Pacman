@@ -5,10 +5,9 @@
 class Fruit : public GameObject {
 	int ttl;
 public:
-	Fruit() : 
-		GameObject(getRandomNumber(5, 9) + '0', DEFAULT), 
+	Fruit(Position& startPos) :
+		GameObject(getRandomNumber(5, 9) + '0', DEFAULT, startPos),
 		ttl(getRandomNumber(5, 15)) {};
-	void initPos();
 	int getVal() { return sign - '0'; };
 	void turn();
 	bool isDead() { return ttl == 0; };

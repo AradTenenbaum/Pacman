@@ -28,11 +28,21 @@ Board::Board() : board{ {"############################### ######################
 						{"############################### ########################################### ####"}} 
 {}
 
+void Board::setBoard(char _board[HEIGHT][WIDTH]) {
+	breadCurmbs = 0;
+	for (int i = 0; i < HEIGHT; i++) {
+		for (int j = 0; j < WIDTH; j++) {
+			if (_board[i][j] == '*') breadCurmbs++;
+			board[i][j] = _board[i][j];
+		}
+	}
+}
+
 void Board::print() {
-	for (string line : board) {
-		for (char box : line) {
-			if (box != '*') setElementColor(color);
-			cout << box;
+	for (int i = 0; i < HEIGHT; i++) {
+		for (int j = 0; j < WIDTH; j++) {
+			if (board[i][j] != '*') setElementColor(color);
+			cout << board[i][j];
 			setElementColor(DEFAULT);
 		}
 		cout << endl;

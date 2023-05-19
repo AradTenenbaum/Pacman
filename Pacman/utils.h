@@ -24,3 +24,4 @@ void setElementColor(int color);
 int getRandomMove(int possibleDirs[]);
 int getRandomNumber(int min, int max);
 int getRandomColor();
+string formatStr(const char* format, ...);

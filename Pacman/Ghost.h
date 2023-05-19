@@ -5,6 +5,6 @@
 
 class Ghost : public GameObject {
 public:
-	Ghost() : GameObject('$', DEFAULT) {};
-	void initPos();
+	Ghost(Position& startPos) : GameObject('$', DEFAULT, startPos) {};
+	void smartMove(const Position& target, int possibleDirs[]);
 };

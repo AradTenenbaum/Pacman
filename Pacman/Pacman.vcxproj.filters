@@ -69,4 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="pacman_01.screen.txt" />
+    <Text Include="pacman_02.screen.txt" />
+    <Text Include="pacman_03.screen.txt" />
+  </ItemGroup>
 </Project>
