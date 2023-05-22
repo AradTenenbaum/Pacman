@@ -18,16 +18,16 @@ bool GameObject::isCollide(const Position& _pos, const Position& _prevPos) const
 void GameObject::move(int dir) {
 	prevPos = pos;
 
-	if (dir == 0) {
+	if (dir == LEFT) {
 		pos.addX(-1);
 	}
-	if (dir == 1) {
+	if (dir == RIGHT) {
 		pos.addX(1);
 	}
-	if (dir == 2) {
+	if (dir == UP) {
 		pos.addY(-1);
 	}
-	if (dir == 3) {
+	if (dir == DOWN) {
 		pos.addY(1);
 	}
 }

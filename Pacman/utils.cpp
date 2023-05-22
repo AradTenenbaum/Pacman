@@ -79,6 +79,7 @@ bool isOnBounds(int x, int y) {
 }
 
 int getRandomMove(int possibleDirs[]) {
+
 	int dir, dirIndex = 0, numOfDirs = 0;
 	for (int i = 0; i < 4; i++) {
 		if (possibleDirs[i] == 1) numOfDirs++;

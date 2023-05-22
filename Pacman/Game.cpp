@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Board.h"
+#include "Ghost.h"
 #include <conio.h>
 #include <windows.h>
 #include <typeinfo>
@@ -10,123 +11,29 @@
 
 using namespace std;
 
-
-void Game::displayMenu() {
-	clearScreen();
-	gotoxy(0, 0);
-	cout << "----Welcome To The Pacman Game----" << endl;
-	cout << "(1) Start a new game" << endl;
-	cout << "(6) Change Level from a file" << endl;	
-	cout << "(7) Settings" << endl;
-	cout << "(8) Present instructions and keys" << endl;
-	cout << "(9) EXIT" << endl;
-	cout << "----------------------------------" << endl;
-}
-
-void Game::displayInstructions() {
-	clearScreen();
-	gotoxy(0, 0);
-	cout << "------Instructions and keys------" << endl;
-	cout << "The objective of the game is to eat all of the dots placed in the maze while avoiding four colored ghosts" << endl;
-	cout << "keys:" << endl;
-	cout << "Left  -> a|A" << endl;
-	cout << "Right -> d|D" << endl;
-	cout << "Up    -> w|W" << endl;
-	cout << "Down  -> x|X" << endl;
-	cout << "Stay  -> s|S" << endl;
-	cout << "Pause -> ESC" << endl;
-	cout << "---------------------------------" << endl;
-	cout << "Press ENTER to continue" << endl;
-	char key = 0;
-	do {
-		if (_kbhit()) key = _getch();
-	} while (key != ENTER);
-}
-
-void Game::displayLevels() {
-	char key = 0;
-	int newLevel = 0;
-	clearScreen();
-	gotoxy(0, 0);
-	cout << "------Levels--------" << endl;
-	cout << "level: " << level << endl;
-	cout << "(D) level-up" << endl;
-	cout << "(A) level-down" << endl;
-	cout << "(S) enter a file name" << endl;
-	cout << "--------------------" << endl;
-	cout << "Press ENTER to continue" << endl;
-	do {
-		if (_kbhit()) key = _getch();
-		if (key == 'D' || key == 'd') {
-			levelUp();
-			clearScreen();
-			gotoxy(0, 0);
-			cout << "------Levels--------" << endl;
-			cout << "level: " << level << endl;
-			cout << "(D) level-up" << endl;
-			cout << "(A) level-down" << endl;
-			cout << "(S) enter a file name" << endl;
-			cout << "--------------------" << endl;
-			cout << "Press ENTER to continue" << endl;
-			key = 0;
+void Game::startMenu() {
+	int choice;
+	bool isPressedExit = false;
+	while (!isPressedExit) {
+		menu.display();
+		cin >> choice;
+		if (choice == 1) {
+			init();
+			run();
 		}
-		if (key == 'A' || key == 'a') {
-			levelDown();
-			clearScreen();
-			gotoxy(0, 0);
-			cout << "------Levels--------" << endl;
-			cout << "level: " << level << endl;
-			cout << "(D) level-up" << endl;
-			cout << "(A) level-down" << endl;
-			cout << "(S) enter a file name" << endl;
-			cout << "--------------------" << endl;
-			cout << "Press ENTER to continue" << endl;
-			key = 0;
+		else if (choice == 6) {
+			menu.levels(level, isInProgress);
 		}
-		if (key == 'S' || key == 's') {
-			clearScreen();
-			gotoxy(0, 0);
-			cout << "------Levels--------" << endl;
-			cout << "Level: ";
-			cin >> newLevel;
-			setLevel(newLevel);
-			clearScreen();
-			gotoxy(0, 0);
-			cout << "------Levels--------" << endl;
-			cout << "level: " << level << endl;
-			cout << "(D) level-up" << endl;
-			cout << "(A) level-down" << endl;
-			cout << "(S) enter a file name" << endl;
-			cout << "--------------------" << endl;
-			cout << "Press ENTER to continue" << endl;
-			key = 0;
+		else if (choice == 7) {
+			menu.settings(isColors);
 		}
-	} while (key != ENTER);
-}
-
-void Game::displaySettings() {
-	char key = 0;
-	clearScreen();
-	gotoxy(0, 0);
-	cout << "------Settings------" << endl;
-	cout << "colors: " << (isColors ? "on" : "off") << endl;
-	cout << "(SPACE) Set colors" << endl;
-	cout << "--------------------" << endl;
-	cout << "Press ENTER to continue" << endl;
-	do {
-		if (_kbhit()) key = _getch();
-		if (key == SPACE) {
-			setColors();
-			clearScreen();
-			gotoxy(0, 0);
-			cout << "------Settings------" << endl;
-			cout << "colors: " << (isColors ? "on" : "off") << endl;
-			cout << "(SPACE) Set colors" << endl;
-			cout << "--------------------" << endl;
-			cout << "Press ENTER to continue" << endl;
-			key = 0;
+		else if (choice == 8) {
+			menu.instructions();
 		}
-	} while (key != ENTER);
+		else if (choice == 9) {
+			isPressedExit = true;
+		}
+	}
 }
 
 void Game::init() {
@@ -144,16 +51,16 @@ void Game::init() {
 		while (getline(newfile, tp)) {
 			for (int j = 0; j <= tp.size(); j++) {
 				Position pos = Position(j, i);
-				if (tp[j] == '%') board[i][j] = ' ';
+				if (tp[j] == '%') board[i][j] = SPACE;
 				else if (tp[j] == '@') {
 					Pacman* player = new Pacman(pos);
 					gameObjects.push_back(player);
 					setPlayer(player);
-					board[i][j] = ' ';
+					board[i][j] = SPACE;
 				}
 				else if (tp[j] == '$') {
 					gameObjects.push_back(new Ghost(pos));
-					board[i][j] = ' ';
+					board[i][j] = SPACE;
 				}
 				else board[i][j] = tp[j];
 			}
@@ -190,7 +97,7 @@ void Game::init() {
 
 	initPositions();
 	points = 0;
-	lives = LIVES;
+	if (!isInProgress) lives = LIVES;
 	draw();
 }
 
@@ -246,7 +153,7 @@ void Game::run() {
 				if (typeid(*gameObject) == typeid(Pacman)) {
 					if(isValidMove(key) && !isStay) {
 						gameBoard.drawPos(gameObject->getPos());
-						gameObject->move(key);
+						static_cast<Pacman*>(gameObject)->move(key);
 						// check if breadcrumb exist for increasing points
 						if (onBreadCurmb()) {
 							addPoints(10);
@@ -260,7 +167,7 @@ void Game::run() {
 						}
 					}
 					else if (!isStay) {
-						logScreen("not a valid move: %d", key);
+						//logScreen("not a valid move: %d", key);
 					}
 				}
 				else if (typeid(*gameObject) == typeid(Ghost)) {
@@ -273,14 +180,29 @@ void Game::run() {
 						gameObject->draw();
 					}
 
+					//TEST
+					Pair src = make_pair(gameObject->getPos().getX(), gameObject->getPos().getY());
+
+					Pair dest = make_pair(player->getPos().getX(), player->getPos().getY());
+					//static_cast<Ghost*>(gameObject)->aStarSearch(gameBoard, src, dest);
+					//TEST
+
 					// check if player on the same position of one of the ghosts
 					// check if player or one of the ghosts swap places
 					// drop one live if true
 					if (player->isCollide(gameObject->getPos(), gameObject->getPrevPos())) {
 						dropLive();
 						initPositions();
-						key = 0;
-						logScreen("Hit by a ghost");
+						key = STAY;
+						//logScreen("Hit by a ghost");
+					}
+
+					for (const auto& gameObject2 : gameObjects) {
+						if (typeid(*gameObject2) == typeid(Fruit)) {
+							if (gameObject->isCollide(gameObject2->getPos(), gameObject2->getPrevPos())) {
+								deadFruits.push_back(static_cast<Fruit*>(gameObject2));
+							}
+						}
 					}
 					
 				}
@@ -323,6 +245,7 @@ void Game::run() {
 		}
 
 		if (lives == 0) {
+			isInProgress = false;
 			clearScreen();
 			cout << "----Game Over----" << endl;
 			cout << "Press any key to return to menu" << endl;
@@ -333,6 +256,8 @@ void Game::run() {
 			isGameOver = true;
 		}
 		if (isWin) {
+			isInProgress = true;
+			level++;
 			clearScreen();
 			cout << "----You win----" << endl;
 			cout << "Press any key to return to menu" << endl;
@@ -420,7 +345,7 @@ void Game::fruitDisappear(Fruit* fruit) {
 }
 
 void Game::eatFruit(Fruit* fruit) {
-	logScreen("Eat a fruit, gained %d points", fruit->getVal());
+	//logScreen("Eat a fruit, gained %d points", fruit->getVal());
 	points += fruit->getVal();
 	setStats();
 	fruitDisappear(fruit);

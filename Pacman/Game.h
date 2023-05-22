@@ -5,35 +5,32 @@
 #include "Pacman.h"
 #include "Ghost.h"
 #include "Fruit.h"
+#include "Menu.h"
 #include <string>
 #include <iostream>
 #include <list>
 
-using namespace std;
-
 class Game {
-	enum { ESC = 27, ENTER = 13, SPACE = ' ', LIVES = 3 };
+	enum { ESC = 27, LIVES = 3 };
 	Board gameBoard;
 	Pacman* player;
 	list<GameObject*> gameObjects;
 	int points=0, lives=LIVES;
 	bool isColors = true;
+	bool isErrorInInit = false;
+	bool isInProgress = false;
 	int speed = 200;
 	int fruitAmount = 0;
 	int maxFruitAmount = 5;
 	int maxGhostsAmount = 2;
 	int level = 1;
-	bool isErrorInInit = false;
+	Menu menu;
 public:
-	void displayMenu();
-	void displayInstructions();
-	void displaySettings();
-	void displayLevels();
+	void startMenu();
+private:
+	void setPlayer(Pacman* p) { player = p; };
 	void init();
 	void run();
-	void setPlayer(Pacman* p) { player = p; };
-	void setColors() { isColors = !isColors; };
-private:
 	void setStats();
 	void setLevel(int _level) { level = _level; };
 	void levelUp() { level++; };

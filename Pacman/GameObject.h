@@ -1,9 +1,10 @@
 #pragma once
+#include "GameObject.h"
 #include "Position.h"
 #include "utils.h"
-
 class GameObject {
 protected:
+	enum { LEFT, RIGHT, UP, DOWN };
 	Position pos;
 	Position prevPos;
 	Position startPos;

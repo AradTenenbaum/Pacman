@@ -7,11 +7,14 @@ using namespace std;
 
 enum {
 	LEFT = 'A', RIGHT = 'D', UP = 'W', DOWN = 'X', STAY = 'S',
-	LEFT_L = 'a', RIGHT_L = 'd', UP_L = 'w', DOWN_L = 'x', STAY_L = 's',
+	LEFT_L = 'a', RIGHT_L = 'd', UP_L = 'w', DOWN_L = 'x', STAY_L = 's', ENTER = 13, SPACE = ' ',
 	RED = 4, BLUE = 1, YELLOW = 14, GRAY = 8, BRIGHT_GREEN = 2, DEFAULT = 15,
 	WHITE = 7, PURPLE = 5,
-	WIDTH = 81, HEIGHT = 24
+	WIDTH = 81, HEIGHT = 24,
+	NOT_FOUND = -1,
 };
+enum { WALL = '#', BREAD_CRUMB = '*' };
+
 void gotoxy(int x, int y);
 void gotoxyPos(Position pos);
 void clearScreen();

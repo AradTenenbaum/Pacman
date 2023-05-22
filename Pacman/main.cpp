@@ -4,34 +4,16 @@
 #include <conio.h>
 #include <windows.h>
 #include "utils.h"
+#include <cstdlib>
 
 using namespace std;
 
 int main()
 {
+	srand((unsigned)time(NULL));
+
 	Game game = Game();
-	int choice;
-	bool isPressedExit = false;
-	while (!isPressedExit) {
-		game.displayMenu();
-		cin >> choice;
-		if (choice == 1) {
-			game.init();
-			game.run();
-		}
-		else if (choice == 6) {
-			game.displayLevels();
-		}
-		else if (choice == 7) {
-			game.displaySettings();
-		}
-		else if (choice == 8) {
-			game.displayInstructions();
-		}
-		else if (choice == 9) {
-			isPressedExit = true;
-		}
-	}
+	game.startMenu();
 
     return 0;
 }

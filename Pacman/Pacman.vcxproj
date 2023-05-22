@@ -133,6 +133,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Ghost.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="utils.h" />

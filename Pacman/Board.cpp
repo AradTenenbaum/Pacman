@@ -62,3 +62,5 @@ void Board::drawPos(const Position& pos) {
 	gotoxyPos(pos);
 	cout << board[pos.getY()][pos.getX()];
 }
+
+

@@ -5,18 +5,19 @@
 #include "utils.h"
 
 class Board {
-    enum { WIDTH = 81, HEIGHT = 24 };
+    enum { WIDTH = 81, HEIGHT = 24, WALL= '#', BREAD_CRUMB = '*' };
     char board[HEIGHT][WIDTH];
     int breadCurmbs = 611;
     char color = DEFAULT;
 public:
     Board();
     void setBoard(char _board[HEIGHT][WIDTH]);
+    //char[HEIGHT][WIDTH] getBoard() { return board; };
     void print();
     char get(int x, int y) const {
         return board[y][x];
     }
-    char getPos(Position& pos) const {
+    char getPos(const Position& pos) const {
         return board[pos.getY()][pos.getX()];
     }
     bool isNoBreadCrumbs();
