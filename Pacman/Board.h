@@ -12,7 +12,6 @@ class Board {
 public:
     Board();
     void setBoard(char _board[HEIGHT][WIDTH]);
-    //char[HEIGHT][WIDTH] getBoard() { return board; };
     void print();
     char get(int x, int y) const {
         return board[y][x];

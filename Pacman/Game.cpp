@@ -36,12 +36,13 @@ void Game::startMenu() {
 	}
 }
 
+char board[HEIGHT][WIDTH];
+
 void Game::init() {
 	isErrorInInit = false;
 	fstream newfile;
 	newfile.open(formatStr("pacman_%02d.screen.txt", level), ios_base::in);
 
-	char board[HEIGHT][WIDTH];
 
 	gameObjects.clear();
 
@@ -181,10 +182,7 @@ void Game::run() {
 					}
 
 					//TEST
-					Pair src = make_pair(gameObject->getPos().getX(), gameObject->getPos().getY());
-
-					Pair dest = make_pair(player->getPos().getX(), player->getPos().getY());
-					//static_cast<Ghost*>(gameObject)->aStarSearch(gameBoard, src, dest);
+					//static_cast<Ghost*>(gameObject)->aStarSearch(gameBoard, gameObject->getPos(), player->getPos());
 					//TEST
 
 					// check if player on the same position of one of the ghosts
