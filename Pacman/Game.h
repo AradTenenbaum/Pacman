@@ -11,7 +11,7 @@
 #include <list>
 
 class Game {
-	enum { ESC = 27, LIVES = 3 };
+	enum { ESC = 27, LIVES = 3, BEST='a', GOOD='b', NOVICE='c' };
 	Board gameBoard;
 	Pacman* player;
 	list<GameObject*> gameObjects;
@@ -24,6 +24,7 @@ class Game {
 	int maxFruitAmount = 5;
 	int maxGhostsAmount = 2;
 	int level = 1;
+	char difficulty = NOVICE;
 	Menu menu;
 public:
 	void startMenu();
@@ -37,6 +38,7 @@ private:
 	void levelDown() { if(level > 1) level--; };
 	void addPoints(int add);
 	bool isValidMove(int dir);
+	bool isValidMoveGameObject(GameObject* gameObject, int dir);
 	bool onBreadCurmb();
 	bool isFreeSpot(Position& spot);
 	void dropLive();

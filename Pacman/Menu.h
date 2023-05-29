@@ -7,4 +7,5 @@ public:
 	void instructions();
 	void settings(bool& isColors);
 	void levels(int& level, bool& isInProgress);
+	void difficulties(char& difficulty);
 };

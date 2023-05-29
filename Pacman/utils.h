@@ -12,6 +12,7 @@ enum {
 	WHITE = 7, PURPLE = 5,
 	WIDTH = 81, HEIGHT = 24,
 	NOT_FOUND = -1,
+	RANDOM, NORMAL,
 };
 enum { WALL = '#', BREAD_CRUMB = '*' };
 

@@ -10,6 +10,7 @@ void Menu::display() {
 	gotoxy(0, 0);
 	cout << "----Welcome To The Pacman Game----" << endl;
 	cout << "(1) Start a new game" << endl;
+	cout << "(5) Choose difficulty" << endl;
 	cout << "(6) Change Level from a file" << endl;
 	cout << "(7) Settings" << endl;
 	cout << "(8) Present instructions and keys" << endl;
@@ -119,6 +120,61 @@ void Menu::settings(bool& isColors) {
 			cout << "------Settings------" << endl;
 			cout << "colors: " << (isColors ? "on" : "off") << endl;
 			cout << "(SPACE) Set colors" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
+	} while (key != ENTER);
+}
+
+void Menu::difficulties(char& difficulty) {
+	char key = 0;
+	clearScreen();
+	gotoxy(0, 0);
+	cout << "------Difficulties--------" << endl;
+	cout << "difficulty: " << difficulty << endl;
+	cout << "(a) BEST" << endl;
+	cout << "(b) GOOD" << endl;
+	cout << "(c) NOVICE" << endl;
+	cout << "--------------------" << endl;
+	cout << "Press ENTER to continue" << endl;
+	do {
+		if (_kbhit()) key = _getch();
+		if (key == 'A' || key == 'a') {
+			difficulty = 'a';
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Difficulties--------" << endl;
+			cout << "difficulty: " << difficulty << endl;
+			cout << "(a) BEST" << endl;
+			cout << "(b) GOOD" << endl;
+			cout << "(c) NOVICE" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
+		if (key == 'B' || key == 'b') {
+			difficulty = 'b';
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Difficulties--------" << endl;
+			cout << "difficulty: " << difficulty << endl;
+			cout << "(a) BEST" << endl;
+			cout << "(b) GOOD" << endl;
+			cout << "(c) NOVICE" << endl;
+			cout << "--------------------" << endl;
+			cout << "Press ENTER to continue" << endl;
+			key = 0;
+		}
+		if (key == 'C' || key == 'c') {
+			difficulty = 'c';
+			clearScreen();
+			gotoxy(0, 0);
+			cout << "------Difficulties--------" << endl;
+			cout << "difficulty: " << difficulty << endl;
+			cout << "(a) BEST" << endl;
+			cout << "(b) GOOD" << endl;
+			cout << "(c) NOVICE" << endl;
 			cout << "--------------------" << endl;
 			cout << "Press ENTER to continue" << endl;
 			key = 0;

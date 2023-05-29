@@ -12,6 +12,7 @@ using namespace std;
 
 void Ghost::smartMove(const Position& target, int possibleDirs[]) {
 	prevPos = pos;
+	movesNum++;
 
 	int dir = -1;
 	if (target.getX() < pos.getX() && (possibleDirs[0] == 1)) {
@@ -41,6 +42,9 @@ void Ghost::smartMove(const Position& target, int possibleDirs[]) {
 	}
 }
 
+/*
+
+---This is A* algorithm, I'm not using it now, maybe I will in the next excersise---
 
 struct cell {
 	int parent_i, parent_j;
@@ -52,7 +56,13 @@ struct fPos {
 	Position pos;
 	fPos(double _f, Position _pos) : f(_f), pos(_pos) {}
 	bool operator<(const fPos& other) const noexcept { 
-		return (this->f < other.f);
+		if (this->f < other.f) return true;
+		else if (this->f > other.f) return false;
+		else {
+			if (this->pos.getX() < other.pos.getX()) return true;
+			else if (this->pos.getX() > other.pos.getX()) return false;
+			else return (this->pos.getY() < other.pos.getY());
+		}
 	};
 };
 
@@ -68,9 +78,7 @@ bool isUnBlocked(Board board, Position& pos)
 
 double calculateHValue(Position& temp, const Position& dest)
 {
-	return ((double)sqrt(
-		(temp.getX() - dest.getX()) * (temp.getX() - dest.getX())
-		+ (temp.getY() - dest.getY()) * (temp.getY() - dest.getY())));
+	return abs(temp.getX() - dest.getX()) + abs(temp.getY() - dest.getY());
 }
 
 void tracePath(cell cellDetails[HEIGHT][WIDTH], const Position& dest)
@@ -109,7 +117,7 @@ Position posAfterDir(Position& ind, int dir) {
 }
 
 void paintRed(int x, int y) {
-	setElementColor(101);
+	setElementColor(90);
 	gotoxy(x, y);
 	cout << " ";
 	setElementColor(DEFAULT);
@@ -155,18 +163,22 @@ void Ghost::aStarSearch(Board board, const Position& src, const Position& dest) 
 	bool foundDest = false;
 
 	while (!openList.empty()) {
-		fPos p = *openList.begin();
+		fPos q = *openList.begin();
 		openList.erase(openList.begin());
 
-		i = p.pos.getY();
-		j = p.pos.getX();
+		i = q.pos.getY();
+		j = q.pos.getX();
 		closedList[i][j] = true;
 		paintRed(j, i);
+
+		if (i == 2 && j == 25) {
+			int a = 5;
+		}
 
 		double gNew, hNew, fNew;
 
 		for (int dir : directions) {
-			Position tempPos = posAfterDir(p.pos, dir);
+			Position tempPos = posAfterDir(q.pos, dir);
 
 			if (isValid(tempPos)) {
 				if (tempPos == dest) {
@@ -202,3 +214,4 @@ void Ghost::aStarSearch(Board board, const Position& src, const Position& dest) 
 	if (!foundDest)
 		logScreen("Failed to find the Destination Cell\n");
 }
+*/

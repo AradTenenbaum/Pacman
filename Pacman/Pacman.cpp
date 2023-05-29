@@ -6,7 +6,8 @@ using namespace std;
 
 void Pacman::move(int dir) {
 	prevPos = pos;
-	
+	movesNum++;
+
 	if ((dir == LEFT) || (dir == LEFT_L)) {
 		if (pos.isTunnel(dir)) pos.setPos(WIDTH-2, pos.getY());
 		else pos.addX(-1);

@@ -21,6 +21,9 @@ void Game::startMenu() {
 			init();
 			run();
 		}
+		else if (choice == 5) {
+			menu.difficulties(difficulty);
+		}
 		else if (choice == 6) {
 			menu.levels(level, isInProgress);
 		}
@@ -172,12 +175,62 @@ void Game::run() {
 					}
 				}
 				else if (typeid(*gameObject) == typeid(Ghost)) {
+
 					if (iteration % 2 == 0) {
 						// ghosts move
-						getPossibleDirs(gameObject->getPos(), possibleDirs);
 						gameBoard.drawPos(gameObject->getPos());
-						//gameObject->move(getRandomMove(possibleDirs));
-						static_cast<Ghost*>(gameObject)->smartMove(player->getPos(), possibleDirs);
+						getPossibleDirs(gameObject->getPos(), possibleDirs);
+
+						if (difficulty == BEST) {
+							static_cast<Ghost*>(gameObject)->smartMove(player->getPos(), possibleDirs);
+						}
+						else if (difficulty == GOOD) {
+							if (static_cast<Ghost*>(gameObject)->getMode() == NORMAL) {
+								if (static_cast<Ghost*>(gameObject)->isXMovesPassed(20)) {
+									static_cast<Ghost*>(gameObject)->setMode(RANDOM);
+									gameObject->startCounter();
+								}
+								static_cast<Ghost*>(gameObject)->smartMove(player->getPos(), possibleDirs);
+							}
+							else if (static_cast<Ghost*>(gameObject)->getMode() == RANDOM) {
+								if (static_cast<Ghost*>(gameObject)->isXMovesPassed(5)) {
+									static_cast<Ghost*>(gameObject)->setMode(NORMAL);
+									gameObject->startCounter();
+									if (isValidMoveGameObject(gameObject, static_cast<Ghost*>(gameObject)->getChosenDir())) {
+										gameObject->move(static_cast<Ghost*>(gameObject)->getChosenDir());
+									}
+									else {
+										gameObject->increaseMovesNum();
+									}
+									static_cast<Ghost*>(gameObject)->setChosenDir(NOT_FOUND);
+								}
+								else if (static_cast<Ghost*>(gameObject)->getChosenDir() == NOT_FOUND) {
+									static_cast<Ghost*>(gameObject)->setChosenDir(getRandomMove(possibleDirs));
+								}
+								if (isValidMoveGameObject(gameObject, static_cast<Ghost*>(gameObject)->getChosenDir())) {
+									gameObject->move(static_cast<Ghost*>(gameObject)->getChosenDir());
+								}
+								else {
+									gameObject->increaseMovesNum();
+								}
+							}
+						}
+						else if (difficulty == NOVICE) {
+							if (static_cast<Ghost*>(gameObject)->getChosenDir() == NOT_FOUND) {
+								static_cast<Ghost*>(gameObject)->setChosenDir(getRandomMove(possibleDirs));
+							}
+							if (static_cast<Ghost*>(gameObject)->isXMovesPassed(20)) {
+								static_cast<Ghost*>(gameObject)->setChosenDir(getRandomMove(possibleDirs));
+								gameObject->startCounter();
+							}
+							if (isValidMoveGameObject(gameObject, static_cast<Ghost*>(gameObject)->getChosenDir())) {
+								gameObject->move(static_cast<Ghost*>(gameObject)->getChosenDir());
+							}
+							else {
+								gameObject->increaseMovesNum();
+							}
+						}
+
 						gameObject->draw();
 					}
 
@@ -286,6 +339,15 @@ void Game::pause() {
 
 bool Game::isValidMove(int dir) {
 	Position&& newPos = player->getPos().posAfterMove(dir);
+	char gamePosObj = gameBoard.getPos(newPos);
+	if (gamePosObj == '#') {
+		return false;
+	}
+	return true;
+}
+
+bool Game::isValidMoveGameObject(GameObject* gameObject, int dir) {
+	Position&& newPos = gameObject->getPos().posAfterMove(dir);
 	char gamePosObj = gameBoard.getPos(newPos);
 	if (gamePosObj == '#') {
 		return false;
